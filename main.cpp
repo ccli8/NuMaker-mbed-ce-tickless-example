@@ -154,7 +154,8 @@ void idle_daemon(void) {
      * or immediately after osKernelResume. */
     while (true) {
         /* Suspend the system */
-        uint32_t ticks_to_sleep = osKernelSuspend();
+        core_util_critical_section_enter();
+        uint32_t ticks_to_sleep = svcRtxKernelSuspend();
         uint32_t elapsed_ticks = 0;
 
         if (ticks_to_sleep) {
@@ -184,6 +185,7 @@ void idle_daemon(void) {
         }
 
         /* Resume the system */
-        osKernelResume(elapsed_ticks);
+        svcRtxKernelResume(elapsed_ticks);
+        core_util_critical_section_exit();
     }
 }
