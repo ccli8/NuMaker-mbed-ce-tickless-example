@@ -3,8 +3,9 @@
 
 #include <vector>
 #include "mbed.h"
-/* EventFlags is supported from mbed-os-5.5.6. Before then, we need EventFlags_. */
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5 && MBED_PATCH_VERSION <= 6)
+/* EventFlags is to support since mbed-os-5.6. Before then, we need EventFlags_ 
+ * to substitute for EventFlags. */
+#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
 #include "EventFlags_.h"
 #endif
 
@@ -22,7 +23,7 @@ enum EventFlag_Wakeup {
     EventFlag_Wakeup_All            = 0xFF,
 };
 
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5 && MBED_PATCH_VERSION <= 6)
+#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
 extern EventFlags_ wakeup_eventflags;
 #else
 extern EventFlags wakeup_eventflags;

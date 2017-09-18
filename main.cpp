@@ -8,7 +8,9 @@ static void flush_stdio_uart_fifo(void);
 static void check_wakeup_source(uint32_t, bool deepsleep);
 static void idle_daemon(void);
 
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5 && MBED_PATCH_VERSION <= 6)
+/* EventFlags is to support since mbed-os-5.6. Before then, we need EventFlags_ 
+ * to substitute for EventFlags. */
+#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
 EventFlags_ wakeup_eventflags;
 #else
 EventFlags wakeup_eventflags;

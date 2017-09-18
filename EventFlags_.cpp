@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 #include "mbed.h"
-/* EventFlags is supported from mbed-os-5.5.6. Before then, we need EventFlags_. */
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5 && MBED_PATCH_VERSION <= 6)
+/* EventFlags is to support since mbed-os-5.6. Before then, we need EventFlags_ 
+ * to substitute for EventFlags. */
+#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
 
 #include "EventFlags_.h"
 #include <string.h>
