@@ -5,8 +5,10 @@
 
 #define YEAR0       1900
 
-static void schedule_rtc_alarm(void *secs_);
-Event<void()> *schedule_rtc_alarm_event;
+static Semaphore sem_rtc(0, 1);
+
+static void rtc_loop(void);
+static void schedule_rtc_alarm(uint32_t secs);
 
 void RTC_IRQHandler(void)
 {
@@ -26,19 +28,38 @@ void RTC_IRQHandler(void)
         wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
     }
 #endif
+
+    /* Wake up RTC loop to schedule another RTC alarm */
+    sem_rtc.release();
 }
 
 void config_rtc_wakeup(void)
 {
-    Callback<void()> callback(&schedule_rtc_alarm, (void *) 3);
-    static RtosTimer timer(callback, osTimerPeriodic);
-    timer.start(4000);
+    static Thread thread_rtc;
+    
+    Callback<void()> callback(&rtc_loop);
+    thread_rtc.start(callback);
 }
 
-void schedule_rtc_alarm(void *secs_)
+void rtc_loop(void)
 {
-    uint32_t secs = (uint32_t) secs_;
+    /* Schedule RTC alarm in 3 secs */
+    schedule_rtc_alarm(3);
     
+    while (true) {
+        int32_t sem_tokens = sem_rtc.wait(osWaitForever);
+        if (sem_tokens < 1) {
+            printf("RTC Alarm fails with Semaphore.wait(): %d\n", sem_tokens);
+        }
+        else {
+            /* Re-schedule RTC alarm in 3 secs */
+            schedule_rtc_alarm(3);
+        }
+    }
+}
+
+void schedule_rtc_alarm(uint32_t secs)
+{
     /* time() will call set_time(0) internally to set timestamp if rtc is not yet enabled, where the 0 timestamp 
      * corresponds to 00:00 hours, Jan 1, 1970 UTC. But Nuvoton mcu's rtc supports calendar since 2000 and 1970 
      * is not supported. For this test, a timestamp after 2000 is explicitly set. */ 
