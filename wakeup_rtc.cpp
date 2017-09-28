@@ -35,7 +35,7 @@ void RTC_IRQHandler(void)
 
 void config_rtc_wakeup(void)
 {
-    static Thread thread_rtc;
+    static Thread thread_rtc(osPriorityNormal, 2048);
     
     Callback<void()> callback(&rtc_loop);
     thread_rtc.start(callback);
