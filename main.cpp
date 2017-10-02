@@ -6,7 +6,7 @@
 
 static void flush_stdio_uart_fifo(void);
 static void check_wakeup_source(uint32_t, bool deepsleep);
-static void idle_daemon(void);
+static void idle_hdlr(void);
 
 /* EventFlags is to support since mbed-os-5.6. Before then, we need EventFlags_ 
  * to substitute for EventFlags. */
@@ -27,7 +27,7 @@ int main() {
     //config_i2c_wakeup();
     
     /* Register idle handler which supports tickless */
-    Thread::attach_idle_hook(idle_daemon);
+    Thread::attach_idle_hook(idle_hdlr);
     
     while (true) {
         
@@ -141,7 +141,7 @@ void check_wakeup_source(uint32_t flags, bool deepsleep)
 
 void dummy_cb(void) {}
 
-void idle_daemon(void) {
+void idle_hdlr(void) {
     
     const int max_us_sleep = (INT_MAX / OS_TICK_FREQ) * OS_TICK_FREQ; 
     /* Keep track of the time asleep */
@@ -149,43 +149,36 @@ void idle_daemon(void) {
     /* Will wake up the system (by lp_ticker) if no other wake-up event */
     LowPowerTimeout alarm_clock;
 
-    /* Never ends. The rtos will suspend this thread when there is something to do
-     * either before osKernelSuspend actually suspend the system (and is not in svc) 
-     * or immediately after osKernelResume. */
-    while (true) {
-        /* Suspend the system */
-        core_util_critical_section_enter();
-        uint32_t ticks_to_sleep = svcRtxKernelSuspend();
-        uint32_t elapsed_ticks = 0;
+    /* Suspend the system */
+    uint32_t ticks_to_sleep = osKernelSuspend();
+    uint32_t elapsed_ticks = 0;
 
-        if (ticks_to_sleep) {
-            uint64_t us_to_sleep = ticks_to_sleep * US_PER_OS_TICK;
+    if (ticks_to_sleep) {
+        uint64_t us_to_sleep = ticks_to_sleep * US_PER_OS_TICK;
 
-            if (us_to_sleep > max_us_sleep) { 
-                us_to_sleep = max_us_sleep;
-            }
-
-            /* Start the asleep_watch and setup the alarm_clock to wake up the system in us_to_sleep */
-            asleep_watch.start();
-            alarm_clock.attach_us(dummy_cb, us_to_sleep);
-
-            /* Go to deep sleep */
-            deepsleep();
-            
-            /* Woken up by lp_ticker or other wake-up event */
-            int us_asleep = asleep_watch.read_us();
-
-            /* Clean up asleep_watch and alarm_clock */
-            asleep_watch.stop();
-            asleep_watch.reset();
-            alarm_clock.detach();
-
-            /* Translate us_asleep into ticks */
-            elapsed_ticks = us_asleep / US_PER_OS_TICK;
+        if (us_to_sleep > max_us_sleep) { 
+            us_to_sleep = max_us_sleep;
         }
 
-        /* Resume the system */
-        svcRtxKernelResume(elapsed_ticks);
-        core_util_critical_section_exit();
+        /* Start the asleep_watch and setup the alarm_clock to wake up the system in us_to_sleep */
+        asleep_watch.start();
+        alarm_clock.attach_us(dummy_cb, us_to_sleep);
+
+        /* Go to deep sleep */
+        deepsleep();
+            
+        /* Woken up by lp_ticker or other wake-up event */
+        int us_asleep = asleep_watch.read_us();
+
+        /* Clean up asleep_watch and alarm_clock */
+        asleep_watch.stop();
+        asleep_watch.reset();
+        alarm_clock.detach();
+
+        /* Translate us_asleep into ticks */
+        elapsed_ticks = us_asleep / US_PER_OS_TICK;
     }
+
+    /* Resume the system */
+    osKernelResume(elapsed_ticks);
 }
