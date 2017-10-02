@@ -1,7 +1,13 @@
 #include "mbed.h"
 #include "wakeup.h"
-
+    
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+/* This target doesn't support relocating vector table and requires overriding 
+ * vector handler at link-time. */
+extern "C" void WDT_IRQHandler(void)
+#else
 void WDT_IRQHandler(void)
+#endif
 {
     /* Check WDT interrupt flag */
     if (WDT_GET_TIMEOUT_INT_FLAG()) {
@@ -23,13 +29,17 @@ void config_wdt_wakeup()
     CLK_EnableModuleClock(WDT_MODULE);
 
     /* Select IP clock source */
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+    CLK_SetModuleClock(WDT_MODULE, 0, 0);
+#else
     CLK_SetModuleClock(WDT_MODULE, CLK_CLKSEL1_WDTSEL_LIRC, 0);
+#endif
 
     SYS_UnlockReg();
     /* Alarm every 2^14 LIRC clocks, disable system reset, enable system wake-up */
     WDT_Open(WDT_TIMEOUT_2POW14, 0, FALSE, TRUE);
     SYS_LockReg();
-
+    
     /* NOTE: The name of symbol WDT_IRQHandler is mangled in C++ and cannot override that in startup file in C.
      *       So the NVIC_SetVector call cannot be left out. */
     NVIC_SetVector(WDT_IRQn, (uint32_t) WDT_IRQHandler);

@@ -22,6 +22,13 @@
 #define SERIAL_CTS  D12
 #define SERIAL_RTS  D11
 
+#elif defined(TARGET_NUMAKER_PFM_NANO130)
+// Serial
+#define SERIAL_RX   D0
+#define SERIAL_TX   D1
+#define SERIAL_CTS  PB_7
+#define SERIAL_RTS  PB_6
+
 #endif
 
 /* This handler is to be called in UART interrupt context (which is extended by Nuvoton's UART HAL implementation 

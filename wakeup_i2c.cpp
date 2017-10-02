@@ -19,6 +19,11 @@
 #define I2C_SDA     D9
 #define I2C_SCL     D8
 
+#elif defined(TARGET_NUMAKER_PFM_NANO130)
+// I2C
+#define I2C_SDA     D14
+#define I2C_SCL     D15
+
 #endif
 
 /* NOTE: Per test (on NUC472/M453/M487), we could handle in time from idle mode (shallow sleep) wake-up, 

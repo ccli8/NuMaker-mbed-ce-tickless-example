@@ -10,10 +10,23 @@ static Semaphore sem_rtc(0, 1);
 static void rtc_loop(void);
 static void schedule_rtc_alarm(uint32_t secs);
 
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+/* This target doesn't support relocating vector table and requires overriding 
+ * vector handler at link-time. */
+extern "C" void RTC_IRQHandler(void)
+#else
 void RTC_IRQHandler(void)
+#endif
 {
     /* Check if RTC alarm interrupt has occurred */
-#if defined(TARGET_NUMAKER_PFM_NUC472)
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+    if (RTC->RIIR & RTC_RIIR_AIF_Msk) {
+        /* Clear RTC alarm interrupt flag */
+        RTC->RIIR = RTC_RIIR_AIF_Msk;
+        
+        wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
+    }
+#elif defined(TARGET_NUMAKER_PFM_NUC472)
     if (RTC->INTSTS & RTC_INTSTS_ALMIF_Msk) {
         /* Clear RTC alarm interrupt flag */
         RTC->INTSTS = RTC_INTSTS_ALMIF_Msk;
@@ -74,7 +87,11 @@ void schedule_rtc_alarm(uint32_t secs)
         }
     }
     
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+    RTC_DisableInt(RTC_RIER_AIER_Msk);
+#else
     RTC_DisableInt(RTC_INTEN_ALMIEN_Msk);
+#endif
     
     time_t t = time(NULL);
     t += secs; // Schedule RTC alarm after secs
@@ -107,5 +124,9 @@ void schedule_rtc_alarm(uint32_t secs)
     NVIC_SetVector(RTC_IRQn, (uint32_t) RTC_IRQHandler);
     NVIC_EnableIRQ(RTC_IRQn);
     /* Enable RTC alarm interrupt and wake-up function will be enabled also */
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+    RTC_EnableInt(RTC_RIER_AIER_Msk);
+#else
     RTC_EnableInt(RTC_INTEN_ALMIEN_Msk);
+#endif
 }
