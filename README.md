@@ -62,10 +62,17 @@ Wake up by Button1 from <b>deep sleep</b>
 Usually it is `lp_ticker` which is internal with the tickless mechanism.
 
 ## Known issues
-1. `Ticker`, `Timeout`, and `Timer` will misbehave with this example. These timers rely on 
-internal `us_ticker`, which rely on high-res clocks HXT/HIRC, which are stopped in idle time to save power.
-The issue is to be addressed in next mbed OS version.
+1. Since mbed OS **5.6.2**, `Ticker`, `Timeout`, and `Timer` could work correctly with this example.
+But use of them would lock deep sleep and cause the system from entering into deep sleep mode.
+It is because these timers rely on internal `us_ticker`, which relies on high-res clocks HXT/HIRC,
+which are forced to stop in deep sleep mode to save more power.
+To ensure these timers work correctly, the system is guarded from entering into deep sleep mode during their use.
 
-1. Interrupt callback and asynchronous transfer in `Serial`, `SPI`, `CAN`, etc. won't work with this example.
-These peripherals rely on high-res clocks HXT/HIRC to operate, which are stopped in idle time to save power.
-Same as above, the issue will be addressed in next mbed OS version.
+1. Use of interrupt callback and asynchronous transfer in `Serial`, `SPI`, `CAN`, etc. has the same issue as above.
+
+1. Use of wait series functions (`wait`/`wait_ms`/`wait_us`) has the same issue as above.
+During the wait time, the system is guarded from entering deep sleep mode.
+
+1. Use of `EventQueue` has the same issue as above because `EventQueue` relies on `Timer`/`Ticker` for its internal counting.
+
+1. Use of `RtosTimer` can work seamlessly with this example because `RtosTimer` relies on system timer rather than `us_ticker`.
