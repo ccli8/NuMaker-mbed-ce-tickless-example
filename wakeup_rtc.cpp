@@ -3,12 +3,35 @@
 #include "rtc_api.h"
 #include "mbed_mktime.h"
 
-#define YEAR0       1900
+/* Micro seconds per second */
+#define NU_US_PER_SEC               1000000
+
+/* Timer clock per second
+ *
+ * NOTE: This dependents on real hardware.
+ */
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+#define NU_RTCCLK_PER_SEC           (__LXT)
+#else
+#define NU_RTCCLK_PER_SEC           ((CLK->CLKSEL3 & CLK_CLKSEL3_SC0SEL_Msk) ? __LIRC : __LXT)
+#endif
+
+/* Start year of struct TM*/
+#define NU_TM_YEAR0         1900
+/* Start year of POSIX time (set_time()/time()) */
+#define NU_POSIX_YEAR0      1970
+/* Start year of H/W RTC */
+#define NU_HWRTC_YEAR0      2000
 
 static Semaphore sem_rtc(0, 1);
 
 static void rtc_loop(void);
 static void schedule_rtc_alarm(uint32_t secs);
+
+/* Convert date time from H/W RTC to struct TM */
+static void rtc_convert_datetime_hwrtc_to_tm(struct tm *datetime_tm, const S_RTC_TIME_DATA_T *datetime_hwrtc);
+/* Convert date time from struct TM to H/W RTC */
+static void rtc_convert_datetime_tm_to_hwrtc(S_RTC_TIME_DATA_T *datetime_hwrtc, const struct tm *datetime_tm);
 
 #if defined(TARGET_NUMAKER_PFM_NANO130)
 /* This target doesn't support relocating vector table and requires overriding 
@@ -93,29 +116,51 @@ void schedule_rtc_alarm(uint32_t secs)
     RTC_DisableInt(RTC_INTEN_ALMIEN_Msk);
 #endif
     
-    time_t t = time(NULL);
-    t += secs; // Schedule RTC alarm after secs
+    /* Schedule RTC alarm
+     *
+     * Mbed OS RTC API doesn't support RTC alarm function. To enable it, we need to control RTC H/W directly.
+     * Because RTC H/W doesn't inevitably record real date time, we cannot calculate alarm time based on time()
+     * timestamp. Instead, we fetch date time recorded in RTC H/W for our calculation of scheduled alarm time.
+     *
+     * Control flow would be:
+     * 1. Fetch RTC H/W date time.
+     * 2. Convert RTC H/W date time to timestamp: S_RTC_TIME_DATA_T > struct tm > time_t
+     * 3. Calculate alarm time based on timestamp above
+     * 4. Convert calculated timestamp back to RTC H/W date time: time_t > struct tm > S_RTC_TIME_DATA_T
+     * 5. Control RTC H/W to schedule alarm
+     */
+    time_t t_alarm;
+    struct tm datetime_tm_alarm;
+    S_RTC_TIME_DATA_T datetime_hwrtc_alarm;
+
+    /* Fetch RTC H/W date time */
+    RTC_GetDateAndTime(&datetime_hwrtc_alarm);
     
-    // Convert timestamp to struct tm
-    struct tm timeinfo;
-    if (_rtc_localtime(t, &timeinfo, RTC_FULL_LEAP_YEAR_SUPPORT) == false) {
-        printf("config_rtc_alarm() fails\n");
+    /* Convert date time from H/W RTC to struct TM */
+    rtc_convert_datetime_hwrtc_to_tm(&datetime_tm_alarm, &datetime_hwrtc_alarm);
+    
+    /* Convert date time of struct TM to POSIX time */
+    if (! _rtc_maketime(&datetime_tm_alarm, &t_alarm, RTC_FULL_LEAP_YEAR_SUPPORT)) {
+        printf("%s: _rtc_maketime failed\n", __func__);
         return;
     }
 
-    S_RTC_TIME_DATA_T rtc_datetime;
+    /* Calculate RTC alarm time */
+    t_alarm += secs; 
+
+    /* Convert POSIX time to date time of struct TM */
+    if (! _rtc_localtime(t_alarm, &datetime_tm_alarm, RTC_FULL_LEAP_YEAR_SUPPORT)) {
+        printf("%s: _rtc_localtime failed\n", __func__);
+        return;
+    }
+
+    /* Convert date time from struct TM to H/W RTC */
+    rtc_convert_datetime_tm_to_hwrtc(&datetime_hwrtc_alarm, &datetime_tm_alarm);
     
-    // Convert struct tm to S_RTC_TIME_DATA_T
-    rtc_datetime.u32Year        = timeinfo.tm_year + YEAR0;
-    rtc_datetime.u32Month       = timeinfo.tm_mon + 1;
-    rtc_datetime.u32Day         = timeinfo.tm_mday;
-    rtc_datetime.u32DayOfWeek   = timeinfo.tm_wday;
-    rtc_datetime.u32Hour        = timeinfo.tm_hour;
-    rtc_datetime.u32Minute      = timeinfo.tm_min;
-    rtc_datetime.u32Second      = timeinfo.tm_sec;
-    rtc_datetime.u32TimeScale   = RTC_CLOCK_24;
-    
-    RTC_SetAlarmDateAndTime(&rtc_datetime);
+    /* Control RTC H/W to schedule alarm */
+    RTC_SetAlarmDateAndTime(&datetime_hwrtc_alarm);
+    /* NOTE: When engine is clocked by low power clock source (LXT/LIRC), we need to wait for 3 engine clocks. */
+    wait_us((NU_US_PER_SEC / NU_RTCCLK_PER_SEC) * 3);
     
     /* NOTE: The Mbed RTC HAL implementation of Nuvoton's targets doesn't use interrupt, so we can override vector
              handler (via NVIC_SetVector). */
@@ -129,4 +174,42 @@ void schedule_rtc_alarm(uint32_t secs)
 #else
     RTC_EnableInt(RTC_INTEN_ALMIEN_Msk);
 #endif
+}
+
+/*
+ struct tm
+   tm_sec      seconds after the minute 0-61
+   tm_min      minutes after the hour 0-59
+   tm_hour     hours since midnight 0-23
+   tm_mday     day of the month 1-31
+   tm_mon      months since January 0-11
+   tm_year     years since 1900
+   tm_wday     days since Sunday 0-6
+   tm_yday     days since January 1 0-365
+   tm_isdst    Daylight Saving Time flag
+*/
+static void rtc_convert_datetime_hwrtc_to_tm(struct tm *datetime_tm, const S_RTC_TIME_DATA_T *datetime_hwrtc)
+{
+    datetime_tm->tm_year = datetime_hwrtc->u32Year - NU_TM_YEAR0;
+    datetime_tm->tm_mon  = datetime_hwrtc->u32Month - 1;
+    datetime_tm->tm_mday = datetime_hwrtc->u32Day;
+    datetime_tm->tm_wday = datetime_hwrtc->u32DayOfWeek;
+    datetime_tm->tm_hour = datetime_hwrtc->u32Hour;
+    if (datetime_hwrtc->u32TimeScale == RTC_CLOCK_12 && datetime_hwrtc->u32AmPm == RTC_PM) {
+        datetime_tm->tm_hour += 12;
+    }
+    datetime_tm->tm_min  = datetime_hwrtc->u32Minute;
+    datetime_tm->tm_sec  = datetime_hwrtc->u32Second;
+}
+
+static void rtc_convert_datetime_tm_to_hwrtc(S_RTC_TIME_DATA_T *datetime_hwrtc, const struct tm *datetime_tm)
+{
+    datetime_hwrtc->u32Year = datetime_tm->tm_year + NU_TM_YEAR0;
+    datetime_hwrtc->u32Month = datetime_tm->tm_mon + 1;
+    datetime_hwrtc->u32Day = datetime_tm->tm_mday;
+    datetime_hwrtc->u32DayOfWeek = datetime_tm->tm_wday;
+    datetime_hwrtc->u32Hour = datetime_tm->tm_hour;
+    datetime_hwrtc->u32TimeScale = RTC_CLOCK_24;
+    datetime_hwrtc->u32Minute = datetime_tm->tm_min;
+    datetime_hwrtc->u32Second = datetime_tm->tm_sec;
 }
