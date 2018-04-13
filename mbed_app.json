@@ -24,9 +24,5 @@
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCLKSRC_IRC10K",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCLKSEL_16"
         }
-    },
-    "macros": [
-        "MBED_MAJOR_VERSION=5",
-        "MBED_MINOR_VERSION=6"
-    ]
+    }
 }

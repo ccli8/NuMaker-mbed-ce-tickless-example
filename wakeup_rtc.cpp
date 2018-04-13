@@ -98,7 +98,7 @@ void schedule_rtc_alarm(uint32_t secs)
     
     // Convert timestamp to struct tm
     struct tm timeinfo;
-    if (_rtc_localtime(t, &timeinfo) == false) {
+    if (_rtc_localtime(t, &timeinfo, RTC_FULL_LEAP_YEAR_SUPPORT) == false) {
         printf("config_rtc_alarm() fails\n");
         return;
     }

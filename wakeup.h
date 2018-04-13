@@ -3,11 +3,6 @@
 
 #include <vector>
 #include "mbed.h"
-/* EventFlags is to support since mbed-os-5.6. Before then, we need EventFlags_ 
- * to substitute for EventFlags. */
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
-#include "EventFlags_.h"
-#endif
 
 enum EventFlag_Wakeup {
     EventFlag_Wakeup_Button1        = (1 << 0),
@@ -23,11 +18,7 @@ enum EventFlag_Wakeup {
     EventFlag_Wakeup_All            = 0xFF,
 };
 
-#if (MBED_MAJOR_VERSION <= 5 && MBED_MINOR_VERSION <= 5)
-extern EventFlags_ wakeup_eventflags;
-#else
 extern EventFlags wakeup_eventflags;
-#endif
 
 void config_pwrctl(void);
 void config_button_wakeup(void);
