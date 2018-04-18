@@ -6,7 +6,9 @@
 
 static void flush_stdio_uart_fifo(void);
 static void check_wakeup_source(uint32_t, bool deepsleep);
+#if (! defined(MBED_TICKLESS))
 static void idle_hdlr(void);
+#endif
 
 EventFlags wakeup_eventflags;
 
@@ -20,9 +22,13 @@ int main() {
     //config_uart_wakeup();
     //config_i2c_wakeup();
     
+#if defined(MBED_TICKLESS)
+    /* Run Mbed OS internal idle handler */
+#else
     /* Register idle handler which supports tickless */
     Thread::attach_idle_hook(idle_hdlr);
-    
+#endif
+
     while (true) {
         
         printf("I am going to shallow/deep sleep\n");
@@ -130,6 +136,8 @@ void check_wakeup_source(uint32_t flags, bool deepsleep)
     }
 }
 
+#if (! defined(MBED_TICKLESS))
+
 #define US_PER_SEC              (1000 * 1000)
 #define US_PER_OS_TICK          (US_PER_SEC / OS_TICK_FREQ)
 
@@ -176,3 +184,5 @@ void idle_hdlr(void) {
     /* Resume the system */
     osKernelResume(elapsed_ticks);
 }
+
+#endif

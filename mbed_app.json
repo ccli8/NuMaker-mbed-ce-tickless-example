@@ -1,25 +1,25 @@
 {
     "target_overrides": {
         "NUMAKER_PFM_NUC472": {
-            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512"],
+            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", "MBED_TICKLESS"],
             "target.gpio-irq-debounce-enable-list": "SW1, SW2",
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_IRC10K",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_256"
         },
         "NUMAKER_PFM_M453": {
-            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512"],
+            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", "MBED_TICKLESS"],
             "target.gpio-irq-debounce-enable-list": "SW2, SW3",
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
         },
         "NUMAKER_PFM_M487": {
-            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512"],
+            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", "MBED_TICKLESS"],
             "target.gpio-irq-debounce-enable-list": "SW2, SW3",
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
         },
         "NUMAKER_PFM_NANO130": {
-            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512"],
+            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", "MBED_TICKLESS"],
             "target.gpio-irq-debounce-enable-list": "SW1, SW2",
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCLKSRC_IRC10K",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCLKSEL_16"
