@@ -6,9 +6,10 @@ With tickless support, user program would enter **Idle** mode (shallow sleep) or
 automatically when CPU is idle.
 
 ## Supported platforms
-- [NuMaker-PFM-NUC472](https://developer.mbed.org/platforms/Nuvoton-NUC472/)
-- [NuMaker-PFM-M453](https://developer.mbed.org/platforms/Nuvoton-M453/)
-- [NuMaker-PFM-M487](https://developer.mbed.org/platforms/NUMAKER-PFM-M487/)
+- [NuMaker-PFM-NUC472](https://os.mbed.com/platforms/Nuvoton-NUC472/)
+- [NuMaker-PFM-M453](https://os.mbed.com/platforms/Nuvoton-M453/)
+- [NuMaker-PFM-M487](https://os.mbed.com/platforms/NuMaker-PFM-M487/)
+- [NuMaker-PFM-NANO130](https://os.mbed.com/platforms/NuMaker-PFM-NANO130/)
 
 ## Supported wake-up source
 - Button(s)
@@ -17,6 +18,24 @@ automatically when CPU is idle.
 - RTC alarm
 - UART CTS state change (TODO)
 - I2C address match (TODO)
+
+## Choose idle handler
+Application user can choose to use Mbed OS internal idle handler or customize its own one.
+1. To use Mbed OS internal idle handler, ensure the `MBED_TICKLESS` macro is defined in `mbed_app.json`.
+1. To customize idle handler, ensure the `MBED_TICKLESS` macro is not defined in `mbed_app.json`.
+   This gives flexibility for providing platform-dependent idle handler.
+   The `idle_hdlr` in `main.cpp` is a trivial example.
+
+<pre>
+{
+    "target_overrides": {
+        "NUMAKER_PFM_NUC472": {
+            "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", <b>"MBED_TICKLESS"</b>],
+            "target.gpio-irq-debounce-enable-list": "SW1, SW2",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_IRC10K",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_256"
+        },
+</pre>
 
 ## Execution
 To run this tickless example, target board must run with no ICE connected.
