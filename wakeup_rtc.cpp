@@ -83,14 +83,10 @@ void rtc_loop(void)
     schedule_rtc_alarm(3);
     
     while (true) {
-        int32_t sem_tokens = sem_rtc.wait(osWaitForever);
-        if (sem_tokens < 1) {
-            printf("RTC Alarm fails with Semaphore.wait(): %d\n", sem_tokens);
-        }
-        else {
-            /* Re-schedule RTC alarm in 3 secs */
-            schedule_rtc_alarm(3);
-        }
+        sem_rtc.acquire();
+
+        /* Re-schedule RTC alarm in 3 secs */
+        schedule_rtc_alarm(3);
     }
 }
 

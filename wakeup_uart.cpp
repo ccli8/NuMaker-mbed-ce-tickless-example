@@ -62,11 +62,8 @@ static void poll_serial(void)
     serial.attach(callback, mbed::SerialBase::TxIrq);
     
     while (true) {
-        int32_t sem_tokens = sem_serial.wait(osWaitForever);
-        if (sem_tokens < 1) {
-            continue;
-        }
-    
+        sem_serial.acquire();
+
         wakeup_eventflags.set(EventFlag_Wakeup_UART_CTS);
     }
 }
@@ -79,6 +76,8 @@ static void serial_tx_callback(Serial *serial_)
 void nu_uart_cts_wakeup_handler(UART_T *uart_base)
 {
     (void) uart_base;
-    
+
+    /* FIXME: Clear wake-up event to enable re-entering Power-down mode */
+
     sem_serial.release();
 }

@@ -57,11 +57,8 @@ static void poll_i2c(void)
     i2c_slave.address(I2C_ADDR);
     
     while (true) {
-        int32_t sem_tokens = sem_i2c.wait(osWaitForever);
-        if (sem_tokens < 1) {
-            continue;
-        }
-    
+        sem_i2c.acquire();
+
         bool has_notified_wakeup = false;
         /* This timer is to check if there is I2C traffic remaining. */
         Timer timer;
@@ -92,15 +89,14 @@ static void poll_i2c(void)
                     break;
             }
         }
-
-        /* Clear wake-up events by I2C traffic which would have been handled above */
-        sem_i2c.wait(0);
     }
 }
 
 void nu_i2c_wakeup_handler(I2C_T *i2c_base)
 {
     (void) i2c_base;
-    
+
+    /* FIXME: Clear wake-up event to enable re-entering Power-down mode */
+
     sem_i2c.release();
 }

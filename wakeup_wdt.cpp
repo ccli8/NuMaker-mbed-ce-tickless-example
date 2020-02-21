@@ -1,6 +1,12 @@
+/* Avoid conflict with Mbed OS watchdog API
+ *
+ * Mbed OS has defined watchdog API. To avoid conflict, disable this code when target has implemented Mbed OS watchdog API.
+ */
+#if !defined(DEVICE_WATCHDOG) || !DEVICE_WATCHDOG
+
 #include "mbed.h"
 #include "wakeup.h"
-    
+
 #if defined(TARGET_NUMAKER_PFM_NANO130)
 /* This target doesn't support relocating vector table and requires overriding 
  * vector handler at link-time. */
@@ -49,3 +55,11 @@ void config_wdt_wakeup()
     WDT_EnableInt();
     SYS_LockReg();
 }
+
+#else
+
+void config_wdt_wakeup()
+{
+}
+
+#endif  /* #if !defined(DEVICE_WATCHDOG) || !DEVICE_WATCHDOG */
