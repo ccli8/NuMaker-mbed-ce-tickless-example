@@ -1,5 +1,10 @@
 {
     "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate"          : 115200,
+            "platform.stdio-convert-newlines"   : true,
+            "platform.stdio-buffered-serial"    : false
+        },
         "NUMAKER_PFM_NUC472": {
             "target.macros_add": ["OS_IDLE_THREAD_STACK_SIZE=512", "MBED_TICKLESS"],
             "target.gpio-irq-debounce-enable-list": "SW1, SW2",
