@@ -42,24 +42,31 @@ void RTC_IRQHandler(void)
 #endif
 {
     /* Check if RTC alarm interrupt has occurred */
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
     if (RTC->RIIR & RTC_RIIR_AIF_Msk) {
         /* Clear RTC alarm interrupt flag */
         RTC->RIIR = RTC_RIIR_AIF_Msk;
         
         wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
     }
-#elif defined(TARGET_NUMAKER_PFM_NUC472)
+#elif defined(TARGET_NUC472)
     if (RTC->INTSTS & RTC_INTSTS_ALMIF_Msk) {
         /* Clear RTC alarm interrupt flag */
         RTC->INTSTS = RTC_INTSTS_ALMIF_Msk;
 
         wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
     }
-#else
+#elif defined(TARGET_M451) || defined(TARGET_M480)
     if (RTC_GET_ALARM_INT_FLAG()) {
         /* Clear RTC alarm interrupt flag */
         RTC_CLEAR_ALARM_INT_FLAG();
+
+        wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
+    }
+#else
+    if (RTC_GET_ALARM_INT_FLAG(RTC)) {
+        /* Clear RTC alarm interrupt flag */
+        RTC_CLEAR_ALARM_INT_FLAG(RTC);
 
         wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
     }

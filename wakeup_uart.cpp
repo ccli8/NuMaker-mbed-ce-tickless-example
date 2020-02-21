@@ -1,7 +1,14 @@
 #include "mbed.h"
 #include "wakeup.h"
 
-#if defined(TARGET_NUMAKER_PFM_NUC472)
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+// Serial
+#define SERIAL_RX   D0
+#define SERIAL_TX   D1
+#define SERIAL_CTS  PB_7
+#define SERIAL_RTS  PB_6
+
+#elif defined(TARGET_NUMAKER_PFM_NUC472)
 // Serial
 #define SERIAL_RX   PF_0
 #define SERIAL_TX   PD_15
@@ -22,12 +29,12 @@
 #define SERIAL_CTS  D12
 #define SERIAL_RTS  D11
 
-#elif defined(TARGET_NUMAKER_PFM_NANO130)
+#elif defined(TARGET_NUMAKER_IOT_M263A)
 // Serial
 #define SERIAL_RX   D0
 #define SERIAL_TX   D1
-#define SERIAL_CTS  PB_7
-#define SERIAL_RTS  PB_6
+#define SERIAL_CTS  PB_9
+#define SERIAL_RTS  PB_8
 
 #endif
 

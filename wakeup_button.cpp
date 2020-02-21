@@ -1,7 +1,12 @@
 #include "mbed.h"
 #include "wakeup.h"
 
-#if defined(TARGET_NUMAKER_PFM_NUC472)
+#if defined(TARGET_NUMAKER_PFM_NANO130)
+// SW
+#define BUTTON1     SW1
+#define BUTTON2     SW2
+
+#elif defined(TARGET_NUMAKER_PFM_NUC472)
 // SW
 #define BUTTON1     SW1
 #define BUTTON2     SW2
@@ -16,10 +21,10 @@
 #define BUTTON1     SW2
 #define BUTTON2     SW3
 
-#elif defined(TARGET_NUMAKER_PFM_NANO130)
+#elif defined(TARGET_NUMAKER_IOT_M263A)
 // SW
-#define BUTTON1     SW1
-#define BUTTON2     SW2
+#define BUTTON1     SW2
+#define BUTTON2     SW3
 
 #endif
 
