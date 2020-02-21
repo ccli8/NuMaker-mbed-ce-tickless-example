@@ -36,6 +36,13 @@
 #define SERIAL_CTS  PB_9
 #define SERIAL_RTS  PB_8
 
+#elif defined(TARGET_NUMAKER_M252KG)
+// Serial
+#define SERIAL_RX   D0
+#define SERIAL_TX   D1
+#define SERIAL_CTS  PB_9
+#define SERIAL_RTS  PB_8
+
 #endif
 
 /* This handler is to be called in UART interrupt context (which is extended by Nuvoton's UART HAL implementation 

@@ -39,6 +39,10 @@
             "target.gpio-irq-debounce-enable-list": "SW2, SW3",
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_M252KG": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false
         }
     }
 }

@@ -28,6 +28,8 @@
 
 #endif
 
+#if defined(BUTTON1) && defined(BUTTON2)
+
 static InterruptIn button1(BUTTON1);
 static InterruptIn button2(BUTTON2);
 static void button1_release(void);
@@ -72,3 +74,11 @@ void button2_press(void)
     wakeup_eventflags.set(EventFlag_Wakeup_Button2);
 }
 #endif
+
+#else
+
+void config_button_wakeup(void)
+{
+}
+
+#endif /* #if defined(BUTTON1) && defined(BUTTON2) */

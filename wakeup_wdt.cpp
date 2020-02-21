@@ -42,8 +42,14 @@ void config_wdt_wakeup()
 #endif
 
     SYS_UnlockReg();
+#if defined(TARGET_M251)
+    /* Alarm every 2^16 LIRC clocks, disable system reset, enable system wake-up */
+    /* LIRC higher than other targets, so enlarge clock count */
+    WDT_Open(WDT_TIMEOUT_2POW16, 0, FALSE, TRUE);
+#else
     /* Alarm every 2^14 LIRC clocks, disable system reset, enable system wake-up */
     WDT_Open(WDT_TIMEOUT_2POW14, 0, FALSE, TRUE);
+#endif
     SYS_LockReg();
     
     /* NOTE: The name of symbol WDT_IRQHandler is mangled in C++ and cannot override that in startup file in C.
