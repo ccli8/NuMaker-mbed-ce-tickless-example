@@ -21,6 +21,11 @@
 #define BUTTON1     SW2
 #define BUTTON2     SW3
 
+#elif defined(TARGET_NUMAKER_IOT_M487)
+// SW
+#define BUTTON1     SW2
+#define BUTTON2     SW3
+
 #elif defined(TARGET_NUMAKER_IOT_M263A)
 // SW
 #define BUTTON1     SW2

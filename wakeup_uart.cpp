@@ -29,6 +29,13 @@
 #define SERIAL_CTS  D12
 #define SERIAL_RTS  D11
 
+#elif defined(TARGET_NUMAKER_IOT_M487)
+// Serial
+#define SERIAL_RX   D13
+#define SERIAL_TX   D10
+#define SERIAL_CTS  D12
+#define SERIAL_RTS  D11
+
 #elif defined(TARGET_NUMAKER_IOT_M263A)
 // Serial
 #define SERIAL_RX   D0
