@@ -2,7 +2,7 @@
 #include "wakeup.h"
 
 
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
 /* Power-down wake-up interrupt handler */
 /* This target doesn't support relocating vector table and requires overriding 
  * vector handler at link-time. */

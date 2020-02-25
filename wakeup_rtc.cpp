@@ -10,7 +10,7 @@
  *
  * NOTE: This dependents on real hardware.
  */
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
 #define NU_RTCCLK_PER_SEC           (__LXT)
 #else
 #define NU_RTCCLK_PER_SEC           ((CLK->CLKSEL3 & CLK_CLKSEL3_SC0SEL_Msk) ? __LIRC : __LXT)
@@ -33,7 +33,7 @@ static void rtc_convert_datetime_hwrtc_to_tm(struct tm *datetime_tm, const S_RTC
 /* Convert date time from struct TM to H/W RTC */
 static void rtc_convert_datetime_tm_to_hwrtc(S_RTC_TIME_DATA_T *datetime_hwrtc, const struct tm *datetime_tm);
 
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
 /* This target doesn't support relocating vector table and requires overriding 
  * vector handler at link-time. */
 extern "C" void RTC_IRQHandler(void)
@@ -113,7 +113,7 @@ void schedule_rtc_alarm(uint32_t secs)
         }
     }
     
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
     RTC_DisableInt(RTC_RIER_AIER_Msk);
 #else
     RTC_DisableInt(RTC_INTEN_ALMIEN_Msk);
@@ -172,7 +172,7 @@ void schedule_rtc_alarm(uint32_t secs)
     NVIC_SetVector(RTC_IRQn, (uint32_t) RTC_IRQHandler);
     NVIC_EnableIRQ(RTC_IRQn);
     /* Enable RTC alarm interrupt and wake-up function will be enabled also */
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
     RTC_EnableInt(RTC_RIER_AIER_Msk);
 #else
     RTC_EnableInt(RTC_INTEN_ALMIEN_Msk);

@@ -11,6 +11,11 @@ automatically when CPU is idle.
 - [NuMaker-PFM-NUC472](https://os.mbed.com/platforms/Nuvoton-NUC472/)
 - [NuMaker-PFM-M453](https://os.mbed.com/platforms/Nuvoton-M453/)
 - [NuMaker-PFM-M487](https://os.mbed.com/platforms/NuMaker-PFM-M487/)
+- [NuMaker-IoT-M487](https://os.mbed.com/platforms/NUMAKER-IOT-M487/)
+- [NuMaker-IoT-M263A](https://os.mbed.com/platforms/NUMAKER-IOT-M263A/)
+- NuMaker-M252KG
+
+**Note**: With TrustZone, this example cannot support [NuMaker-PFM-M2351](https://os.mbed.com/platforms/NUMAKER-PFM-M2351/). But users can still achieve power saving goal through **tickless mode+tickless from lp_ticker** (see below).
 
 ## Supported wake-up source
 - Button(s)

@@ -84,6 +84,7 @@ void button2_press(void)
 
 void config_button_wakeup(void)
 {
+    printf("Disable button wake-up on this target\n\n");
 }
 
 #endif /* #if defined(BUTTON1) && defined(BUTTON2) */

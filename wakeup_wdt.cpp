@@ -7,7 +7,7 @@
 #include "mbed.h"
 #include "wakeup.h"
 
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
 /* This target doesn't support relocating vector table and requires overriding 
  * vector handler at link-time. */
 extern "C" void WDT_IRQHandler(void)
@@ -35,7 +35,7 @@ void config_wdt_wakeup()
     CLK_EnableModuleClock(WDT_MODULE);
 
     /* Select IP clock source */
-#if defined(TARGET_NUMAKER_PFM_NANO130)
+#if defined(TARGET_NANO100)
     CLK_SetModuleClock(WDT_MODULE, 0, 0);
 #else
     CLK_SetModuleClock(WDT_MODULE, CLK_CLKSEL1_WDTSEL_LIRC, 0);
@@ -64,8 +64,11 @@ void config_wdt_wakeup()
 
 #else
 
+#include "mbed.h"
+
 void config_wdt_wakeup()
 {
+    printf("Disable WDT timeout wake-up on this target\n\n");
 }
 
 #endif  /* #if !defined(DEVICE_WATCHDOG) || !DEVICE_WATCHDOG */
