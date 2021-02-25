@@ -13,7 +13,9 @@ static void idle_hdlr(void);
 EventFlags wakeup_eventflags;
 
 int main() {
-
+#ifdef MBED_MAJOR_VERSION
+    printf("Mbed OS version %d.%d.%d\r\n\n", MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION);
+#endif
     config_pwrctl();
     config_button_wakeup();
     config_wdt_wakeup();

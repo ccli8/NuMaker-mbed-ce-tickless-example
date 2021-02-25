@@ -57,7 +57,11 @@
 extern "C" void nu_uart_cts_wakeup_handler(UART_T *uart_base);
 
 static void poll_serial(void);
+#if MBED_MAJOR_VERSION >= 6
+static void serial_tx_callback(UnbufferedSerial *serial_);
+#else
 static void serial_tx_callback(Serial *serial_);
+#endif
 
 /* Support wake-up by UART CTS state change */
 static Semaphore sem_serial(0, 1);
@@ -72,14 +76,21 @@ void config_uart_wakeup(void)
 
 static void poll_serial(void)
 {
+#if MBED_MAJOR_VERSION >= 6
+    static UnbufferedSerial serial(SERIAL_TX, SERIAL_RX);
+#else
     static Serial serial(SERIAL_TX, SERIAL_RX);
-
+#endif
     /* UART CTS wake-up: clock source is not limited.
      * UART data wake-up: clock source is required to be LXT/LIRC. */
     serial.set_flow_control(SerialBase::RTSCTS, SERIAL_RTS, SERIAL_CTS);
 
     /* We need to register one interrupt handler to enable interrupt. */
+#if MBED_MAJOR_VERSION >= 6
+    Callback<void()> callback((void (*)(UnbufferedSerial *)) &serial_tx_callback, (UnbufferedSerial *) &serial);
+#else
     Callback<void()> callback((void (*)(Serial *)) &serial_tx_callback, (Serial *) &serial);
+#endif
     serial.attach(callback, mbed::SerialBase::TxIrq);
     
     while (true) {
@@ -88,8 +99,11 @@ static void poll_serial(void)
         wakeup_eventflags.set(EventFlag_Wakeup_UART_CTS);
     }
 }
-
+#if MBED_MAJOR_VERSION >= 6
+static void serial_tx_callback(UnbufferedSerial *serial_)
+#else
 static void serial_tx_callback(Serial *serial_)
+#endif
 {
     (void) serial_;
 }
