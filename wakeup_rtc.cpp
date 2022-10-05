@@ -56,7 +56,7 @@ void RTC_IRQHandler(void)
 
         wakeup_eventflags.set(EventFlag_Wakeup_RTC_Alarm);
     }
-#elif defined(TARGET_M451) || defined(TARGET_M480) || defined(TARGET_M251)
+#elif defined(TARGET_M451) || defined(TARGET_M460) || defined(TARGET_M480) || defined(TARGET_M251)
     if (RTC_GET_ALARM_INT_FLAG()) {
         /* Clear RTC alarm interrupt flag */
         RTC_CLEAR_ALARM_INT_FLAG();
