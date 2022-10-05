@@ -47,7 +47,7 @@
             "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
             "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
         },
-        "NUMAKER_M252KG": {
+        "NUMAKER_IOT_M252": {
             "target.macros_add": ["MBED_TICKLESS"],
             "target.tickless-from-us-ticker": false
         }

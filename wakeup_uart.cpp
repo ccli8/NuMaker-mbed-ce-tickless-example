@@ -43,7 +43,7 @@
 #define SERIAL_CTS  PB_9
 #define SERIAL_RTS  PB_8
 
-#elif defined(TARGET_NUMAKER_M252KG)
+#elif defined(TARGET_NUMAKER_IOT_M252)
 // Serial
 #define SERIAL_RX   D0
 #define SERIAL_TX   D1
