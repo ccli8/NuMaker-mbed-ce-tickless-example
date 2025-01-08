@@ -1,0 +1,62 @@
+{
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate"          : 115200,
+            "platform.stdio-convert-newlines"   : true,
+            "platform.stdio-buffered-serial"    : false
+        },
+        "NUMAKER_PFM_NANO130": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW1, SW2",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCLKSRC_IRC10K",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCLKSEL_16"
+        },
+        "NUMAKER_PFM_NUC472": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW1, SW2",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_IRC10K",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_256"
+        },
+        "NUMAKER_PFM_M453": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW2, SW3",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_PFM_M487": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW2, SW3",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_IOT_M467": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "BUTTON1, BUTTON2",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_IOT_M487": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW2, SW3",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_IOT_M263A": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false,
+            "target.gpio-irq-debounce-enable-list": "SW2, SW3",
+            "target.gpio-irq-debounce-clock-source": "GPIO_DBCTL_DBCLKSRC_LIRC",
+            "target.gpio-irq-debounce-sample-rate": "GPIO_DBCTL_DBCLKSEL_16"
+        },
+        "NUMAKER_IOT_M252": {
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.tickless-from-us-ticker": false
+        }
+    }
+}

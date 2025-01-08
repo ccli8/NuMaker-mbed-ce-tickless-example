@@ -28,7 +28,7 @@ int main() {
     /* Run Mbed OS internal idle handler */
 #else
     /* Register idle handler which supports tickless */
-    Thread::attach_idle_hook(idle_hdlr);
+    rtos::Kernel::attach_idle_hook(idle_hdlr);
 #endif
 
     while (true) {
@@ -169,7 +169,7 @@ void idle_hdlr(void) {
         alarm_clock.attach_us(dummy_cb, us_to_sleep);
 
         /* Go to deep sleep */
-        deepsleep();
+        hal_deepsleep();
             
         /* Woken up by lp_ticker or other wake-up event */
         int us_asleep = asleep_watch.read_us();
